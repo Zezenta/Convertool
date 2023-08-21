@@ -1,0 +1,20 @@
+{
+	"name": "Convertool",
+	"description": "An extension to easily convert different units of measure.",
+	"version": "0.1",
+	"manifest_version": 3,
+	"background": {
+    "service_worker": "convertool.js"
+  },
+  "permissions": ["storage", "activeTab", "scripting"],
+    "action": {
+    "default_popup": "popup.html",
+     "default_icon": {
+
+    }
+  },
+  "icons": {
+
+  },
+  "options_page": "options.html"
+}
