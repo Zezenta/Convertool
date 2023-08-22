@@ -16,5 +16,12 @@
   "icons": {
 
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["convertool.js"],
+      "run_at": "document_end"
+    }
+  ],
   "options_page": "options.html"
 }
