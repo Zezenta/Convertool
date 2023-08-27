@@ -18,7 +18,7 @@ const measures = `{
             "meter": 1000,
             "mile": 0.621371,
             "foot":  3280.84,
-            "yard": 1094,
+            "yard": 1094
         }
     },
     "mile":{
