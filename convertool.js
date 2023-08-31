@@ -38,3 +38,17 @@ const measures = `{
     }
 }`;
 
+const measuresObj = JSON.parse(measures);
+
+// Iterate through each key in the object
+for (const key in measuresObj) {
+  if (measuresObj.hasOwnProperty(key)) {
+    const regexArray = measuresObj[key].regex;
+    
+    if (regexArray && Array.isArray(regexArray)) {
+      console.log(`Regex array for "${key}":`, regexArray);
+      
+      // You can perform additional operations on the regexArray here
+    }
+  }
+}
