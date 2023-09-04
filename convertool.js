@@ -45,6 +45,7 @@ const measures = `{
 
 const measuresObj = JSON.parse(measures);
 
+
 //Not sure how exactly I should create the regex array, but I'll have to identify each case with the unit of measure that it represents
 
 // Iterate through each key in the object
@@ -59,3 +60,5 @@ for (const key in measuresObj) {
     }
   }
 }
+
+console.log(regexArray)

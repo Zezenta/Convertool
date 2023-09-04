@@ -45,15 +45,14 @@ const measures = `{
 
 const measuresObj = JSON.parse(measures);
 
+var unitNames = [];
+//Not sure how exactly I should create the regex array, but I'll have to identify each case with the unit of measure that it represents
+
 // Iterate through each key in the object
 for (const key in measuresObj) {
   if (measuresObj.hasOwnProperty(key)) {
-    const regexArray = measuresObj[key].regex;
-    
-    if (regexArray && Array.isArray(regexArray)) {
-      console.log(`Regex array for "${key}":`, regexArray);
-      
-      // You can perform additional operations on the regexArray here
-    }
+    unitNames.push(measuresObj[key].names);
   }
 }
+
+console.table(unitNames)
