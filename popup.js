@@ -49,10 +49,11 @@ var unitNames = [];
 //Not sure how exactly I should create the regex array, but I'll have to identify each case with the unit of measure that it represents
 
 // Iterate through each key in the object
-for (const key in measuresObj) {
-  if (measuresObj.hasOwnProperty(key)) {
-    unitNames.push(measuresObj[key].names);
-  }
-}
+// Iterate through each key in the object
+measuresObj.array.forEach(function (currentArray) {
+    currentArray.array.forEach(function (currentObj) {
+        console.log(currentObj)
+    })
+});
 
 console.table(unitNames)
