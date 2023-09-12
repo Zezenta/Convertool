@@ -43,10 +43,11 @@ const measures = `{
     }
 }`;
 
+var text_to_check = "Test text: The golden gate bridge is about 1.7 miles long. It also could be expressed as 1,280.2 m long. In feet, it could also be expressed as 8,980 ft If we want to convert it to miles, it would be expressed as 1.7 mi This text makes no sense whatsoever, but I need it for testing purposes.";
+
 const measuresObj = JSON.parse(measures);
 
 var separate_unit_names = [];
-var single_array_unit_names = [];
 //Not sure how exactly I should create the regex array, but I'll have to identify each case with the unit of measure that it represents
 
 //this creates the separate_unit_names array, which contains more arrays inside itself
@@ -56,12 +57,6 @@ for (const key in measuresObj) {
   }
 }
 
-//this creates the single_array_unit_names, which is just a big array
-separate_unit_names.forEach(function (currentArray) {
-    currentArray.forEach(function (currentObj) {
-        single_array_unit_names.push(currentObj)
-    })
-});
 
 console.log(single_array_unit_names);
 console.table(separate_unit_names);
@@ -78,9 +73,18 @@ function check_words_of_paragraph(paragraph, mainArray)
         {
             if(subArr.includes(word))
             {
+                console.log("It includes " + word)
                 //TAKES THE WORD IN COUNT AND REPLACES IT
             }
         }
     }
     //RETURN NOTHING TO REPLACE
 }
+
+check_words_of_paragraph(text_to_check, separate_unit_names)
+
+
+//Sometimes the words don't get detected because of periods at the end Example: "mile."
+//I want it to check only a selected text by the user
+//I'll have to create a "preferences" object, I'll check that later
+//the single_array_unit_names seems to be useless I think I'll delete it
