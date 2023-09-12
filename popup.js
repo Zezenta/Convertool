@@ -45,15 +45,42 @@ const measures = `{
 
 const measuresObj = JSON.parse(measures);
 
-var unitNames = [];
+var separate_unit_names = [];
+var single_array_unit_names = [];
 //Not sure how exactly I should create the regex array, but I'll have to identify each case with the unit of measure that it represents
 
-// Iterate through each key in the object
-// Iterate through each key in the object
-measuresObj.array.forEach(function (currentArray) {
-    currentArray.array.forEach(function (currentObj) {
-        console.log(currentObj)
+//this creates the separate_unit_names array, which contains more arrays inside itself
+for (const key in measuresObj) {
+  if (measuresObj.hasOwnProperty(key)) {
+    separate_unit_names.push(measuresObj[key].names);
+  }
+}
+
+//this creates the single_array_unit_names, which is just a big array
+separate_unit_names.forEach(function (currentArray) {
+    currentArray.forEach(function (currentObj) {
+        single_array_unit_names.push(currentObj)
     })
 });
 
-console.table(unitNames)
+console.log(single_array_unit_names);
+console.table(separate_unit_names);
+
+
+//checking if the words inside a paragraph contain any measure unit
+function check_words_of_paragraph(paragraph, mainArray)
+{
+    const words = paragraph.split(/\s+/);
+
+    for(const word of words)
+    {
+        for(const subArr of mainArray)
+        {
+            if(subArr.includes(word))
+            {
+                //TAKES THE WORD IN COUNT AND REPLACES IT
+            }
+        }
+    }
+    //RETURN NOTHING TO REPLACE
+}
