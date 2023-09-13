@@ -45,10 +45,9 @@ const measures = `{
 
 var text_to_check = "Test text: The golden gate bridge is about 1.7 miles long. It also could be expressed as 1,280.2 m long. In feet, it could also be expressed as 8,980 ft If we want to convert it to miles, it would be expressed as 1.7 mi This text makes no sense whatsoever, but I need it for testing purposes.";
 
-const measuresObj = JSON.parse(measures);
+const measuresObj = JSON.parse(measures); //parses all the units into javascript objects
 
-var separate_unit_names = [];
-//Not sure how exactly I should create the regex array, but I'll have to identify each case with the unit of measure that it represents
+var separate_unit_names = []; //array that contains more arrays for the names of each unit of measure
 
 //this creates the separate_unit_names array, which contains more arrays inside itself
 for (const key in measuresObj) {
@@ -57,13 +56,30 @@ for (const key in measuresObj) {
   }
 }
 
-
-console.log(single_array_unit_names);
-console.table(separate_unit_names);
+var single_array_unit_names = []; //array that contains ALL names of each units of measure
+separate_unit_names.forEach(function (currentArray) { //this creates said array from the single_array_unit_names array
+    currentArray.forEach(function (currentObj) {
+        single_array_unit_names.push(currentObj)
+    })
+});
 
 
 //checking if the words inside a paragraph contain any measure unit
-function check_words_of_paragraph(paragraph, mainArray)
+single_array_unit_names.sort((a, b) => b.length - a.length);
+const regex_pattern = "\\d+(\\.|\\,)?\\d*\\s?(" + single_array_unit_names.join('|') + ")"; //double slash because javascript escapes its own characters because it is dumb
+console.log(regex_pattern)
+
+function check_whole_paragraph(paragraph) //checks the whole paragraph at once for regex matches
+{
+    const regex = new RegExp(regex_pattern, 'gi');
+    console.log(regex)
+    const matches = paragraph.match(regex);
+    console.log(matches);
+}
+
+check_whole_paragraph(text_to_check);
+
+function check_words_of_paragraph(paragraph, mainArray) //one by one
 {
     const words = paragraph.split(/\s+/);
 
@@ -81,7 +97,7 @@ function check_words_of_paragraph(paragraph, mainArray)
     //RETURN NOTHING TO REPLACE
 }
 
-check_words_of_paragraph(text_to_check, separate_unit_names)
+//check_words_of_paragraph(text_to_check, separate_unit_names)
 
 
 //Sometimes the words don't get detected because of periods at the end Example: "mile."
