@@ -5,15 +5,23 @@ const measuresObj = `{
             "in": 39.3701,
             "yard": 1.09361
         },
-        "names": ["meter", "mtr", "m", "metro"]
+        "names": {
+            "universal": ["m"],
+            "english": ["meter"],
+            "spanish": ["metro"]
+        }
     },
-    "feet":{
+    "foot":{
         "convertRatio": {
             "meter": 0.3048,
             "in": 12,
             "yard": 0.333333
         },
-        "names": ["foot", "feet", "ft", "pie"]
+        "names": {
+            "universal": ["ft"],
+            "english": ["feet", "foot"],
+            "spanish": ["pie"]
+        }
     },
     "kilometer":{
         "convertRatio": {
@@ -22,7 +30,11 @@ const measuresObj = `{
             "foot":  3280.84,
             "yard": 1094
         },
-        "names": ["kilometer", "kilometre", "km", "kilometro", "kilómetro"]
+        "names": {
+            "universal": ["km"],
+            "english": ["kilometer"],
+            "spanish": ["kilómetro", "kilometro]
+        }
     },
     "mile":{
         "convertRatio": {
@@ -31,7 +43,11 @@ const measuresObj = `{
             "foot": 5280,
             "yard": 1760
         },
-        "names": ["mile", "mi", "milla"]
+        "names": {
+            "universal": ["mi"],
+            "english": ["mile"],
+            "spanish": ["milla"]
+        }
     },
     "inch":{
         "convertRatio": {
@@ -39,7 +55,11 @@ const measuresObj = `{
             "meter": 0.0254,
             "foot": 0.0833333
         },
-        "names": ["inch", "in", "pulgada"]
+        "names": {
+            "universal": ["in"],
+            "english": ["inch"],
+            "spanish": ["pulgada"]
+        }
     }
 }`;
 
