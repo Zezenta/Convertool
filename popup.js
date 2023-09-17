@@ -1,4 +1,4 @@
-const measures = `{
+const measuresObj = `{
     "meter":{
         "convertRatio": {
             "foot": 3.28084,
@@ -43,16 +43,16 @@ const measures = `{
     }
 }`;
 
-var text_to_check = "Test text: The golden gate bridge is about 1.7 miles long. It also could be expressed as 1,280.2 m long. In feet, it could also be expressed as 8,980 ft If we want to convert it to miles, it would be expressed as 1.7 mi This text makes no sense whatsoever, but I need it for testing purposes.";
+var text_to_check = "Test text: The golden gate bridge is about 1.7 miles long. ";
 
-const measuresObj = JSON.parse(measures); //parses all the units into javascript objects
+const measures = JSON.parse(measuresObj); //parses all the units into javascript objects
 
 var separate_unit_names = []; //array that contains more arrays for the names of each unit of measure
 
 //this creates the separate_unit_names array, which contains more arrays inside itself
-for (const key in measuresObj) {
-  if (measuresObj.hasOwnProperty(key)) {
-    separate_unit_names.push(measuresObj[key].names);
+for (const key in measures) {
+  if (measures.hasOwnProperty(key)) {
+    separate_unit_names.push(measures[key].names);
   }
 }
 
@@ -69,15 +69,28 @@ single_array_unit_names.sort((a, b) => b.length - a.length);
 const regex_pattern = "\\d+(\\.|\\,)?\\d*\\s?(" + single_array_unit_names.join('|') + ")"; //double slash because javascript escapes its own characters because it is dumb
 console.log(regex_pattern)
 
+var matches;
+var new_replaced_text;
+
 function check_whole_paragraph(paragraph) //checks the whole paragraph at once for regex matches
 {
     const regex = new RegExp(regex_pattern, 'gi');
     console.log(regex)
-    const matches = paragraph.match(regex);
-    console.log(matches);
+    new_replaced_text = paragraph.replace(regex, match => convert_to_preferences(match));
+    console.log(new_replaced_text);
 }
 
 check_whole_paragraph(text_to_check);
+
+function convert_to_preferences(text_to_convert)
+{
+    var args = text_to_convert.split(" ");
+    var current_unit = String.raw(args[1])
+    console.log(args[1])
+    var current_ratio = measures.current_unit.convertRatio.kilometer;
+    console.log(current_ratio)
+    console.log(measures.mile.convertRatio.kilometer)
+}
 
 function check_words_of_paragraph(paragraph, mainArray) //one by one
 {
