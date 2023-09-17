@@ -7,7 +7,7 @@ const measuresObj = `{
         },
         "names": ["meter", "mtr", "m", "metro"]
     },
-    "foot":{
+    "feet":{
         "convertRatio": {
             "meter": 0.3048,
             "in": 12,
@@ -85,11 +85,19 @@ check_whole_paragraph(text_to_check);
 function convert_to_preferences(text_to_convert)
 {
     var args = text_to_convert.split(" ");
-    var current_unit = String.raw(args[1])
-    console.log(args[1])
-    var current_ratio = measures.current_unit.convertRatio.kilometer;
+    var current_unit_string = args[1]
+    var current_unit = findUnitByString(current_unit_string, measures);
+    var current_ratio = measures[current_unit].convertRatio.kilometer;
     console.log(current_ratio)
-    console.log(measures.mile.convertRatio.kilometer)
+}
+
+function findUnitByString(inputString, dataStructure) {
+    for (const unit in dataStructure) {
+      if (dataStructure[unit].names.includes(inputString)) {
+        return unit;
+      }
+    }
+    return console.error("One of the measures detected doesn't have a place in any of the names[] arrays, this is a very rare error."); // Return null if no match is found
 }
 
 function check_words_of_paragraph(paragraph, mainArray) //one by one
