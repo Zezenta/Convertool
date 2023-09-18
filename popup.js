@@ -11,7 +11,7 @@ const measuresObj = `{
             "spanish": ["metro"]
         }
     },
-    "foot":{
+    "feet":{
         "convertRatio": {
             "meter": 0.3048,
             "in": 12,
@@ -63,9 +63,22 @@ const measuresObj = `{
     }
 }`;
 
-var text_to_check = "Test text: The golden gate bridge is about 1.7 miles long. ";
+var text_to_check = "Test text: The golden gate bridge is about 1.7 kilometers long. ";
 
 const measures = JSON.parse(measuresObj); //parses all the units into javascript objects
+
+var preferencesObj = `{
+    "centimeter": "centimeter",
+    "inch": "centimeter",
+    "meter": "meter",
+    "feet": "meter",
+    "yard": "meter",
+    "meter": "meter",
+    "kilometer": "kilometer",
+    "mile": "kilometer"
+}`;
+
+var preferences = JSON.parse(preferencesObj);
 
 var unit_names = []; //array that contains every single name of every single unit in every single language
 
@@ -80,7 +93,7 @@ console.log(unit_names)
 
 //checking if the words inside a paragraph contain any measure unit
 unit_names.sort((a, b) => b.length - a.length); //we sort the names of the unit_names array from the longest to the shortest
-const regex_pattern = "\\d+(\\.|\\,)?\\d*\\s?(" + unit_names.join('|') + ")"; //double slash because javascript escapes its own characters because it is dumb
+const regex_pattern = "\\d+(\\.|,)?\\d*\\s?(" + unit_names.join('|') + ")"; //double slash because javascript escapes its own characters because it is dumb
 console.log(regex_pattern)
 
 var matches;
@@ -100,12 +113,20 @@ function convert_to_preferences(text_to_convert)
 {
     var args = text_to_convert.split(" "); //we separate the number from the name of the unit
     var current_unit_string = args[1] //we define the current unit string
-    var current_unit = findUnitByString(current_unit_string, measures); //we check exactly what unit it is
-    var current_ratio = measures[current_unit].convertRatio.kilometer; //we get the convert ratio from the current_unit object and the user preference
-    console.log(current_ratio)
+    var current_unit = find_unit_by_string(current_unit_string, measures); //we check exactly what unit it is
+    var preferred_unit = preferences[current_unit]; //we get the preferred unit based on the current unit (the unit we are going to conver to)
+    if(preferred_unit == current_unit) //we check that we are not converting the unit to itself (that would be dumb)
+    {
+        return text_to_convert;
+    }
+    else
+    {
+        var current_ratio = measures[current_unit].convertRatio[preferred_unit]; //we get the convert ratio from the current_unit object and the user preference
+        console.log(current_ratio)
+    }
 }
 
-function findUnitByString(inputString, dataStructure) { //we check exactly what unit a string is based on a dataStructure
+function find_unit_by_string(inputString, dataStructure) { //we check exactly what unit a string is based on a dataStructure
     for (const unit in dataStructure) { //for every unit in the datastructure
         for (const lang in measures[unit].names) //for every language in the names of said unit
         {
