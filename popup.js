@@ -68,13 +68,14 @@ var text_to_check = "Test text: The golden gate bridge is about 1.7 kilometers l
 const measures = JSON.parse(measuresObj); //parses all the units into javascript objects
 
 var preferencesObj = `{
+    "language": "english",
     "centimeter": "centimeter",
     "inch": "centimeter",
     "meter": "meter",
     "feet": "meter",
     "yard": "meter",
     "meter": "meter",
-    "kilometer": "kilometer",
+    "kilometer": "mile",
     "mile": "kilometer"
 }`;
 
@@ -112,16 +113,20 @@ check_whole_paragraph(text_to_check);
 function convert_to_preferences(text_to_convert)
 {
     var args = text_to_convert.split(" "); //we separate the number from the name of the unit
-    var current_unit_string = args[1] //we define the current unit string
-    var current_unit = find_unit_by_string(current_unit_string, measures); //we check exactly what unit it is
-    var preferred_unit = preferences[current_unit]; //we get the preferred unit based on the current unit (the unit we are going to conver to)
+    var value = args[0] //we get the number of the unit
+    var unit_text_info = find_unit_by_string(args[1], measures); //we check exactly what unit it is, inside the measures object
+    var current_unit = unit_text_info[0];//we get the unit itself
+    var current_language = unit_text_info[1]; //we get in which language it is
+    var preferred_unit = preferences[current_unit]; //we get the preferred unit based on the current unit (the unit we are going to convert to)
+
     if(preferred_unit == current_unit) //we check that we are not converting the unit to itself (that would be dumb)
     {
         return text_to_convert;
     }
-    else
+    else if (preferred_unit != current_unit)
     {
-        var current_ratio = measures[current_unit].convertRatio[preferred_unit]; //we get the convert ratio from the current_unit object and the user preference
+        var returned_string = "";
+        var multiplying_ratio = measures[current_unit].convertRatio[preferred_unit]; //we get the convert ratio from the current_unit object and the user preference
         console.log(current_ratio)
     }
 }
@@ -132,7 +137,9 @@ function find_unit_by_string(inputString, dataStructure) { //we check exactly wh
         {
             if(dataStructure[unit].names[lang].includes(inputString)) //if the language array from the names object from the unit object, contains the unit name in the string...
             {
-                return unit; //return the unit name
+                var language_in_use = lang; //returns the specific language in use
+                var returned_array = [unit, language_in_use];
+                return returned_array; //position 0 is the unit name, position 1 is the language in use, so we can return the name in the same language
             }
         }
     }
