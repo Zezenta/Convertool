@@ -11,7 +11,7 @@ const measuresObj = `{
             "spanish": ["metro"]
         }
     },
-    "foot":{
+    "feet":{
         "convertRatio": {
             "meter": 0.3048,
             "in": 12,
@@ -32,8 +32,8 @@ const measuresObj = `{
         },
         "names": {
             "universal": ["km"],
-            "english": ["kilometer", "kilometre],
-            "spanish": ["kilómetro", "kilometro]
+            "english": ["kilometer", "kilometre"],
+            "spanish": ["kilómetro", "kilometro"]
         }
     },
     "mile":{
@@ -60,6 +60,18 @@ const measuresObj = `{
             "english": ["inch"],
             "spanish": ["pulgada"]
         }
+    },
+    "centimeter":{
+        "convertRatio": {
+            "inch": 0.393701,
+            "meter": 0.01,
+            "foot": 0.0328084
+        },
+        "names": {
+            "universal": ["cm"],
+            "english": ["centimeter"],
+            "spanish": ["centímetro", "centimetro"]
+        }
     }
 }`;
 
@@ -67,81 +79,85 @@ var text_to_check = "Test text: The golden gate bridge is about 1.7 miles long. 
 
 const measures = JSON.parse(measuresObj); //parses all the units into javascript objects
 
-var separate_unit_names = []; //array that contains more arrays for the names of each unit of measure
+var preferencesObj = `{
+    "language": "english",
+    "centimeter": "centimeter",
+    "inch": "centimeter",
+    "meter": "meter",
+    "feet": "meter",
+    "yard": "meter",
+    "meter": "meter",
+    "kilometer": "mile",
+    "mile": "kilometer"
+}`;
 
-//this creates the separate_unit_names array, which contains more arrays inside itself
-for (const key in measures) {
-  if (measures.hasOwnProperty(key)) {
-    separate_unit_names.push(measures[key].names);
-  }
+var preferences = JSON.parse(preferencesObj);
+
+var unit_names = []; //array that contains every single name of every single unit in every single language
+
+//this creates the unit_names array, which contains all of the names inside itself
+for (const unit in measures) {
+    for (const lang in measures[unit].names)
+    {
+        unit_names.push(...measures[unit].names[lang]) //checks all of the names[] arrays for every single language in the measures object and adds it to the unit_names array
+    }
 }
-
-var single_array_unit_names = []; //array that contains ALL names of each units of measure
-separate_unit_names.forEach(function (currentArray) { //this creates said array from the single_array_unit_names array
-    currentArray.forEach(function (currentObj) {
-        single_array_unit_names.push(currentObj)
-    })
-});
-
+console.log(unit_names)
 
 //checking if the words inside a paragraph contain any measure unit
-single_array_unit_names.sort((a, b) => b.length - a.length);
-const regex_pattern = "\\d+(\\.|\\,)?\\d*\\s?(" + single_array_unit_names.join('|') + ")"; //double slash because javascript escapes its own characters because it is dumb
+unit_names.sort((a, b) => b.length - a.length); //we sort the names of the unit_names array from the longest to the shortest
+const regex_pattern = "\\d+(\\.|,)?\\d*\\s?(" + unit_names.join('|') + ")"; //double slash because javascript escapes its own characters because it is dumb
 console.log(regex_pattern)
 
 var matches;
 var new_replaced_text;
 
-function check_whole_paragraph(paragraph) //checks the whole paragraph at once for regex matches
+const regex = new RegExp(regex_pattern, 'gi'); //apply the regex pattern to the regex object
+console.log(regex)
+
+function convert_whole_text(paragraph) //checks the whole paragraph at once for regex matches
 {
-    const regex = new RegExp(regex_pattern, 'gi');
-    console.log(regex)
-    new_replaced_text = paragraph.replace(regex, match => convert_to_preferences(match));
+    new_replaced_text = paragraph.replace(regex, match => transform_units(match)); //we apply the regex object and replace the matches with the text returned by the transform_units function 
     console.log(new_replaced_text);
 }
 
-check_whole_paragraph(text_to_check);
+convert_whole_text(text_to_check);
 
-function convert_to_preferences(text_to_convert)
+function transform_units(text_to_convert)
 {
-    var args = text_to_convert.split(" ");
-    var current_unit_string = args[1]
-    var current_unit = findUnitByString(current_unit_string, measures);
-    var current_ratio = measures[current_unit].convertRatio.kilometer;
-    console.log(current_ratio)
-}
+    var args = text_to_convert.split(" "); //we separate the number from the name of the unit
+    var value = args[0] //we get the number of the unit
+    var unit_text_info = find_unit_by_string(args[1], measures); //we check exactly what unit it is, inside the measures object
+    var current_unit = unit_text_info[0];//we get the unit itself
+    var current_language = unit_text_info[1]; //we get in which language it is
+    var preferred_unit = preferences[current_unit]; //we get the preferred unit based on the current unit (the unit we are going to convert to)
 
-function findUnitByString(inputString, dataStructure) {
-    for (const unit in dataStructure) {
-      if (dataStructure[unit].names.includes(inputString)) {
-        return unit;
-      }
-    }
-    return console.error("One of the measures detected doesn't have a place in any of the names[] arrays, this is a very rare error."); // Return null if no match is found
-}
-
-function check_words_of_paragraph(paragraph, mainArray) //one by one
-{
-    const words = paragraph.split(/\s+/);
-
-    for(const word of words)
+    if(preferred_unit == current_unit) //we check that we are not converting the unit to itself (that would be dumb)
     {
-        for(const subArr of mainArray)
+        return text_to_convert;
+    }
+    else if (preferred_unit != current_unit)
+    {
+        var returned_string = "";
+        var multiplying_ratio = measures[current_unit].convertRatio[preferred_unit]; //we get the convert ratio from the current_unit object and the user preference
+        var new_unit_name = measures[preferred_unit].names[current_language][0];
+        returned_string += (value * multiplying_ratio).toFixed(2) + " " + new_unit_name;
+
+        return returned_string;
+    }
+}
+
+function find_unit_by_string(inputString, dataStructure) { //we check exactly what unit a string is based on a dataStructure
+    for (const unit in dataStructure) { //for every unit in the datastructure
+        for (const lang in measures[unit].names) //for every language in the names of said unit
         {
-            if(subArr.includes(word))
+            if(dataStructure[unit].names[lang].includes(inputString)) //if the language array from the names object from the unit object, contains the unit name in the string...
             {
-                console.log("It includes " + word)
-                //TAKES THE WORD IN COUNT AND REPLACES IT
+                var language_in_use = lang; //returns the specific language in use
+                var returned_array = [unit, language_in_use];
+                return returned_array; //position 0 is the unit name, position 1 is the language in use, so we can return the name in the same language
             }
         }
     }
-    //RETURN NOTHING TO REPLACE
+    return console.error("One of the measures detected doesn't have a place in any of the names[] arrays, this is a very rare error."); // Return null if no match is found
 }
-
-//check_words_of_paragraph(text_to_check, separate_unit_names)
-
-
-//Sometimes the words don't get detected because of periods at the end Example: "mile."
-//I want it to check only a selected text by the user
-//I'll have to create a "preferences" object, I'll check that later
-//the single_array_unit_names seems to be useless I think I'll delete it

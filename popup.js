@@ -60,10 +60,22 @@ const measuresObj = `{
             "english": ["inch"],
             "spanish": ["pulgada"]
         }
+    },
+    "centimeter":{
+        "convertRatio": {
+            "inch": 0.393701,
+            "meter": 0.01,
+            "foot": 0.0328084
+        },
+        "names": {
+            "universal": ["cm"],
+            "english": ["centimeter"],
+            "spanish": ["centímetro", "centimetro"]
+        }
     }
 }`;
 
-var text_to_check = "Test text: The golden gate bridge is about 1.7 kilometers long. ";
+var text_to_check = "Test text: The golden gate bridge is about 1.7 miles long. ";
 
 const measures = JSON.parse(measuresObj); //parses all the units into javascript objects
 
@@ -90,27 +102,26 @@ for (const unit in measures) {
         unit_names.push(...measures[unit].names[lang]) //checks all of the names[] arrays for every single language in the measures object and adds it to the unit_names array
     }
 }
-console.log(unit_names)
 
 //checking if the words inside a paragraph contain any measure unit
 unit_names.sort((a, b) => b.length - a.length); //we sort the names of the unit_names array from the longest to the shortest
+console.log(unit_names)
 const regex_pattern = "\\d+(\\.|,)?\\d*\\s?(" + unit_names.join('|') + ")"; //double slash because javascript escapes its own characters because it is dumb
 console.log(regex_pattern)
 
 var matches;
 var new_replaced_text;
 
-function check_whole_paragraph(paragraph) //checks the whole paragraph at once for regex matches
+const regex = new RegExp(regex_pattern, 'gi'); //apply the regex pattern to the regex object
+console.log(regex)
+
+function convert_whole_text(paragraph) //checks the whole paragraph at once for regex matches
 {
-    const regex = new RegExp(regex_pattern, 'gi'); //apply the regex pattern to the regex object
-    console.log(regex)
-    new_replaced_text = paragraph.replace(regex, match => convert_to_preferences(match)); //we apply the regex object and replace the matches with the text returned by the convert_to_preferences function 
+    new_replaced_text = paragraph.replace(regex, match => transform_units(match)); //we apply the regex object and replace the matches with the text returned by the transform_units function 
     console.log(new_replaced_text);
 }
 
-check_whole_paragraph(text_to_check);
-
-function convert_to_preferences(text_to_convert)
+function transform_units(text_to_convert)
 {
     var args = text_to_convert.split(" "); //we separate the number from the name of the unit
     var value = args[0] //we get the number of the unit
@@ -127,7 +138,14 @@ function convert_to_preferences(text_to_convert)
     {
         var returned_string = "";
         var multiplying_ratio = measures[current_unit].convertRatio[preferred_unit]; //we get the convert ratio from the current_unit object and the user preference
-        console.log(current_ratio)
+        var new_unit_name = measures[preferred_unit].names[current_language][0];
+        returned_string += (value * multiplying_ratio).toFixed(2) + " " + new_unit_name;
+        if (current_unit == "feet" && current_language == "english") //if we are using feet, and it is in english, add the "s" manually
+        {
+            returned_string += "s"
+        }
+
+        return returned_string;
     }
 }
 
