@@ -1,4 +1,4 @@
-const measuresObj = `{
+const lengthsObj = `{
     "meter":{
         "convertRatio": {
             "foot": 3.28084,
@@ -77,7 +77,7 @@ const measuresObj = `{
 
 var text_to_check = "Test text: The golden gate bridge is about 1.7 miles long. ";
 
-const measures = JSON.parse(measuresObj); //parses all the units into javascript objects
+const lengths = JSON.parse(lengthsObj); //parses all the units into javascript objects
 
 var preferencesObj = `{
     "language": "english",
@@ -96,16 +96,16 @@ var preferences = JSON.parse(preferencesObj);
 var unit_names = []; //array that contains every single name of every single unit in every single language
 
 //this creates the unit_names array, which contains all of the names inside itself
-for (const unit in measures) {
-    for (const lang in measures[unit].names)
+for (const unit in lengths) {
+    for (const lang in lengths[unit].names)
     {
-        unit_names.push(...measures[unit].names[lang]) //checks all of the names[] arrays for every single language in the measures object and adds it to the unit_names array
+        unit_names.push(...lengths[unit].names[lang]) //checks all of the names[] arrays for every single language in the lengths object and adds it to the unit_names array
     }
 }
-console.log(unit_names)
 
 //checking if the words inside a paragraph contain any measure unit
 unit_names.sort((a, b) => b.length - a.length); //we sort the names of the unit_names array from the longest to the shortest
+console.log(unit_names)
 const regex_pattern = "\\d+(\\.|,)?\\d*\\s?(" + unit_names.join('|') + ")"; //double slash because javascript escapes its own characters because it is dumb
 console.log(regex_pattern)
 
@@ -121,13 +121,11 @@ function convert_whole_text(paragraph) //checks the whole paragraph at once for 
     console.log(new_replaced_text);
 }
 
-convert_whole_text(text_to_check);
-
 function transform_units(text_to_convert)
 {
     var args = text_to_convert.split(" "); //we separate the number from the name of the unit
     var value = args[0] //we get the number of the unit
-    var unit_text_info = find_unit_by_string(args[1], measures); //we check exactly what unit it is, inside the measures object
+    var unit_text_info = find_unit_by_string(args[1], lengths); //we check exactly what unit it is, inside the lengths object
     var current_unit = unit_text_info[0];//we get the unit itself
     var current_language = unit_text_info[1]; //we get in which language it is
     var preferred_unit = preferences[current_unit]; //we get the preferred unit based on the current unit (the unit we are going to convert to)
@@ -139,9 +137,13 @@ function transform_units(text_to_convert)
     else if (preferred_unit != current_unit)
     {
         var returned_string = "";
-        var multiplying_ratio = measures[current_unit].convertRatio[preferred_unit]; //we get the convert ratio from the current_unit object and the user preference
-        var new_unit_name = measures[preferred_unit].names[current_language][0];
+        var multiplying_ratio = lengths[current_unit].convertRatio[preferred_unit]; //we get the convert ratio from the current_unit object and the user preference
+        var new_unit_name = lengths[preferred_unit].names[current_language][0];
         returned_string += (value * multiplying_ratio).toFixed(2) + " " + new_unit_name;
+        if (current_unit == "feet" && current_language == "english") //if we are using feet, and it is in english, add the "s" manually
+        {
+            returned_string += "s"
+        }
 
         return returned_string;
     }
@@ -149,7 +151,7 @@ function transform_units(text_to_convert)
 
 function find_unit_by_string(inputString, dataStructure) { //we check exactly what unit a string is based on a dataStructure
     for (const unit in dataStructure) { //for every unit in the datastructure
-        for (const lang in measures[unit].names) //for every language in the names of said unit
+        for (const lang in lengths[unit].names) //for every language in the names of said unit
         {
             if(dataStructure[unit].names[lang].includes(inputString)) //if the language array from the names object from the unit object, contains the unit name in the string...
             {
@@ -159,5 +161,5 @@ function find_unit_by_string(inputString, dataStructure) { //we check exactly wh
             }
         }
     }
-    return console.error("One of the measures detected doesn't have a place in any of the names[] arrays, this is a very rare error."); // Return null if no match is found
+    return console.error("One of the lengths detected doesn't have a place in any of the names[] arrays, this is a very rare error."); // Return null if no match is found
 }
