@@ -75,9 +75,39 @@ const lengthsObj = `{
     }
 }`;
 
+const weighsObj = `{
+    "kilogram":{
+        "convertRatio": {
+            "pound": 2.20462,
+            "gram": 1000,
+            "miligram": 1000000,
+            "ounce": 35.274
+        },
+        "names": {
+            "universal": ["kg"],
+            "english": ["kilogram", "kilogramme"],
+            "spanish": ["kilogramo"]
+        }
+    },
+    "pound":{
+        "convertRatio": {
+            "kilogram": 0.453592,
+            "gram": 453.592,
+            "miligram": 453592,
+            "ounce": 16
+        },
+        "names": {
+            "universal": ["lb"],
+            "english": ["pound"],
+            "spanish": ["libra"]
+        }
+    }
+}`;
+
 var text_to_check = "Test text: The golden gate bridge is about 1.7 miles long. ";
 
 const lengths = JSON.parse(lengthsObj); //parses all the units into javascript objects
+const weighs = JSON.parse(weighsObj);
 
 var preferencesObj = `{
     "language": "english",
